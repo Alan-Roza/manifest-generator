@@ -1,32 +1,56 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app>
+    <v-app-bar app :color="themeColor" dark>
+      <v-row justify="center">
+        <a style="text-decoration: none;" href="#"
+          ><div class="title-custom">
+            Web App Manifest Generator
+          </div></a
+        >
+      </v-row>
+    </v-app-bar>
+
+    <v-main>
+          <formManifest
+            @themecolor="changedColorTheme"
+            ref="formManifest"
+          />
+    </v-main>
+    <!-- <v-main>
+    </v-main> -->
+  </v-app>
 </template>
+   
+<script>
+import FormManifest from "@/views/FormManifest.vue";
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+export default {
+  name: "App",
 
-#nav {
-  padding: 30px;
-}
+  components: {
+    FormManifest,
+  },
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+  data: () => ({
+    themeColor: '',
+    bgColor: '',
+  }),
+  methods: {
+    validate() {
+      this.$refs.formManifest.validate();
+    },  
+    changedColorTheme(value){
+      this.themeColor = value
+    },
+    changedColorBG(value){
+      this.bgColor = value
+    },
+  },
+};
+</script>
+<style scoped>
+.title-custom {
+  color: white;
+  font-size: 165%;
 }
 </style>
