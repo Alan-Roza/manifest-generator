@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import FormManifest from '@/views/FormManifest.vue'
-import App from '@/App.vue'
+import FormManifest from '@/views/FormManifest.vue'
 
 Vue.use(VueRouter)
 
@@ -9,7 +8,7 @@ const routes = [
   {
     path: '/',
     name: 'Manifest',
-    component: App
+    component: FormManifest
   },
 ]
 

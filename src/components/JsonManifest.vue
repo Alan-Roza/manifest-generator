@@ -131,25 +131,25 @@ export default {
     url: null,
   }),
   methods: {
-//       zip(){
-//         // console.log(this.inputFile);
-//         // var metadata = {
-//         //   contentType: 'application/zip'
-//         // }
-//         console.log("input",this.inputFile);
-//         firebase.functions().useEmulator("localhost", 5001);
-//         const zip = firebase.functions().httpsCallable('zip');
-//         zip({}).then(async(e)=>{
-//           console.log(e, e.data[0]);
-//           var image = new Blob([e[0]], {type : 'image/png'}); 
-//           console.log(image);
-//           var azip = new JSZip();
-//         azip.file('teste.png', image, 'base64');
+    //       zip(){
+    //         // console.log(this.inputFile);
+    //         // var metadata = {
+    //         //   contentType: 'application/zip'
+    //         // }
+    //         console.log("input",this.inputFile);
+    //         firebase.functions().useEmulator("localhost", 5001);
+    //         const zip = firebase.functions().httpsCallable('zip');
+    //         zip({}).then(async(e)=>{
+    //           console.log(e, e.data[0]);
+    //           var image = new Blob([e[0]], {type : 'image/png'}); 
+    //           console.log(image);
+    //           var azip = new JSZip();
+    //         azip.file('teste.png', image, 'base64');
 
-//         azip.generateAsync({type:"blob"}) .then(function(content) {
-//     // see FileSaver.js
-//     saveAs(content, "example.zip");
-// });
+    //         azip.generateAsync({type:"blob"}) .then(function(content) {
+    //     // see FileSaver.js
+    //     saveAs(content, "example.zip");
+    // });
         // .generateNodeStream({type:'blob',streamFiles:true})
         // .pipe(fs.createWriteStream('assets.zip'))
         // .then(function(content) {
@@ -215,7 +215,7 @@ export default {
       // const zip = await firebase.functions().httpsCallable('zip');
       // zip()
 
-    },
+    // },
     click() {
       this.$refs.file.$refs.input.click();
     },
@@ -278,7 +278,8 @@ export default {
     //     )
     //   }
   // },
-};
+  }
+}
 </script>
 <style scoped>
 .text-purple {
