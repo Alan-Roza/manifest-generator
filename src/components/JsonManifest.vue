@@ -101,7 +101,7 @@
     <v-row justify="center" class="mt-4">
       <v-hover v-slot="{ hover }">
         <v-btn
-          @click="generateFile"
+          @click="generateManifest"
           width="40vh"
           class="mt-0"
           large
@@ -118,104 +118,99 @@
   </v-container>
 </template>
 <script>
-// import firebase from "firebase";
-// import JSZip from "jszip";
-// import saveAs from 'file-saver';
+import { functions} from "@/firebase"
+import JSZip from "jszip";
+import saveAs from "file-saver";
+
 export default {
   props: ["message"],
   data: () => ({
-    teste: "",
+    icons: 
+      [
+        {
+          "src": "./assets/manifest-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "maskable any"
+        },
+        {
+          "src": "./assets/manifest-icon-512.png",
+          "sizes": "512x512",
+          "type": "image/png",
+          "purpose": "maskable any"
+        },
+        {
+          "src": "./assets/apple-icon-180.png",
+          "sizes": "180x180",
+          "type": "image/png",
+        },
+        {
+          "src": "./assets/favicon-196.png",
+          "sizes": "196x196",
+          "type": "image/png",
+        },
+        {
+          "src": "./assets/apple-icon-180.png",
+          "sizes": "180x180",
+          "type": "image/png",
+        },
+        {
+          "src": "./assets/mstile-icon-128.png",
+          "sizes": "128x128",
+          "type": "image/png"
+        },
+        {
+          "src": "./assets/mstile-icon-270.png",
+          "sizes": "270x270",
+          "type": "image/png"
+        },
+        {
+          "src": "./assets/mstile-icon-558.png",
+          "sizes": "558x558",
+          "type": "image/png"
+        },
+      ],
+    json: "",
     snackbar: false,
     snackbarMessage: "",
     inputFile: null,
     url: null,
   }),
+
   methods: {
-    //       zip(){
-    //         // console.log(this.inputFile);
-    //         // var metadata = {
-    //         //   contentType: 'application/zip'
-    //         // }
-    //         console.log("input",this.inputFile);
-    //         firebase.functions().useEmulator("localhost", 5001);
-    //         const zip = firebase.functions().httpsCallable('zip');
-    //         zip({}).then(async(e)=>{
-    //           console.log(e, e.data[0]);
-    //           var image = new Blob([e[0]], {type : 'image/png'}); 
-    //           console.log(image);
-    //           var azip = new JSZip();
-    //         azip.file('teste.png', image, 'base64');
+    async generateManifest(){
+      //Generate json manifest with icons
+      this.jsonClipboard("generate")
 
-    //         azip.generateAsync({type:"blob"}) .then(function(content) {
-    //     // see FileSaver.js
-    //     saveAs(content, "example.zip");
-    // });
-        // .generateNodeStream({type:'blob',streamFiles:true})
-        // .pipe(fs.createWriteStream('assets.zip'))
-        // .then(function(content) {
-        //   // see FileSaver.js
-        //   saveAs(content, "example.zip");
-        // });
-          // let storageRef = await firebase.storage().ref('assets.zip');
-        // storageRef.put(e, metadata)
+      const file = this.inputFile
+      //Upload Image to storage from input on front end 
+      this.$store.dispatch('uploadImage', file).then(()=>{
 
-        //  console.log("return",e);
-      //   })
-      // },
+        //Get image url 
+        this.$store.dispatch('getImage', file).then(async (url)=>{
+          //Generate assets
+          functions.useEmulator("localhost", 5001);
+          const generate = functions.httpsCallable('generate');
+          generate({url}).then(async(data)=>{
+            //Generate zip file with images and json
+            let zip = new JSZip();
+            let assets = zip.folder("assets")
+            for(let i = 0; i < data.data.folder.length; i++){
+              assets.file(data.data.folder[i], data.data.imageBase64[i], {base64: true});
+            }
+            zip.file("manifest.json", this.json);
+            zip.generateAsync({type:"blob"})
+            .then(function(content) {
+                saveAs(content, "manifest.zip");
+            });            
+          }).then(async()=>{
+              //Remove image on storage
+              await this.$store.dispatch('deleteImage', file)
+            })          
+        })
+      })      
+    },
 
-    //  upload(){
-    //   const file = this.inputFile
-    //   console.log("here is the file",file);
-    //   firebase.functions().useEmulator("localhost", 5001);
-    //   const uploadImage = firebase.functions().httpsCallable('uploadImage');
-    //   uploadImage({file})
-    // },
-
-    // async generateFile(){
-    //   const file = this.inputFile
-    //   // const storageRef = firebase.storage().ref();
-    //   const fileName = file.name
-
-      //upload file
-      // var storageRef = (await firebase.storage()).ref(fileName);
-      // storageRef.put(file)
-      // .then(async()=>{
-      //   let url = await firebase.storage().ref(file.name).getDownloadURL()
-      //   console.log("log file",file)
-
-      //   // let url = URL.createObjectURL(this.inputFile);
-      //   console.log("url", url)
-      //   // console.log(file)
-      //   firebase.functions().useEmulator("localhost", 5001);
-      //   const addMessage = await firebase.functions().httpsCallable('addMessage');
-      //   addMessage({url}).then(async()=>{
-        // for(let i=0; i<2; i++){
-        //   let place = './manifest/apple-splash-640-1136.jpg';
-        //   let imageRef = storageRef.child('teste1.jpg');
-        //   imageRef.put(place, metadata)
-        //   console.log("here is manifest", place)
-        // // }
-      // })
-
-      // console.log()
-      // create assets
-
-
-
-      // var manifestStorageRef = (await firebase.storage()).ref('manifest/'+ file.name);
-      // manifestStorageRef.put('../../functions/manifest/apple-splash-640-1136.jpg')
-      // })
-
-
-      // let teste = '../../functions/manifest'
-      // var assetStorageRef = (await firebase.storage()).ref('manifest');
-      // var uploadAssets = assetStorageRef.child('manifest/').put(teste)
-      // console.log("chegou", uploadAssets)
-      // firebase.functions().useEmulator("localhost", 5001);
-      // const zip = await firebase.functions().httpsCallable('zip');
-      // zip()
-
-    // },
     click() {
       this.$refs.file.$refs.input.click();
     },
@@ -230,7 +225,7 @@ export default {
       this.snackbar = true;
       this.snackbarMessage = "Error on Copy to Clipboard";
     },
-    jsonClipboard() {
+    jsonClipboard(f) {
       let orientation = this.message.orientationSelect;
       let name = this.message.appName;
       let short = this.message.shortName;
@@ -243,41 +238,39 @@ export default {
       if (this.message.shortName == "") {
         short = undefined;
       }
-      return (this.teste = JSON.stringify(
-        {
-          name: name,
-          short_name: short,
-          theme_color: this.message.themeColor,
-          background_color: this.message.backgroundColor,
-          display: this.message.displaySelect,
-          orientation: orientation,
-          scope: this.message.application,
-          start_url: this.message.url,
-        },
-        null,
-        "\t"
-      ));
+      if(f !== "generate"){
+        return (this.json = JSON.stringify(
+          {
+            name: name,
+            short_name: short,
+            theme_color: this.message.themeColor,
+            background_color: this.message.backgroundColor,
+            display: this.message.displaySelect,
+            orientation: orientation,
+            scope: this.message.application,
+            start_url: this.message.url,
+          },
+          null,
+          "\t"
+        ));
+      }else if (f === "generate"){
+          return (this.json = JSON.stringify(
+            {
+              name: name,
+              short_name: short,
+              theme_color: this.message.themeColor,
+              icons: this.icons,
+              background_color: this.message.backgroundColor,
+              display: this.message.displaySelect,
+              orientation: orientation,
+              scope: this.message.application,
+              start_url: this.message.url,
+            },
+            null,
+            "\t"
+          ));
+        }
     },
-    // myFunction() {
-    //   /* Get the text field */
-    //   var copyText = document.getElementById("text");
-    //   console.log(copyText);
-    //   /* Select the text field */
-    //   copyText.select();
-    //   copyText.setSelectionRange(0, 99999); /* For mobile devices */
-
-    //   /* Copy the text inside the text field */
-    //   document.execCommand("copy");
-
-    //   /* Alert the copied text */
-    //   alert("Copied the text: " + copyText.value);
-    // }
-    //   copy(){
-    //     this.$clipboard(
-    //         this.value
-    //     )
-    //   }
-  // },
   }
 }
 </script>
