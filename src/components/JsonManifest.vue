@@ -190,8 +190,8 @@ export default {
         this.$store.dispatch('getImage', file).then(async (url)=>{
           //Generate assets
           functions.useEmulator("localhost", 5001);
-          const generate = functions.httpsCallable('generate');
-          generate({url}).then(async(data)=>{
+          const generateManifestRun = functions.httpsCallable('generateManifestRun');
+          generateManifestRun({url}).then(async(data)=>{
             //Generate zip file with images and json
             let zip = new JSZip();
             let assets = zip.folder("assets")
